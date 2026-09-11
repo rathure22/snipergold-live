@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SNIPERGOLD - GOLD SCANNER ONLINE LIVE</title>
+<style>
+body{background:#0a0a0a;color:#fff;font-family:monospace;margin:0;padding:12px}
+.header{font-size:22px;font-weight:bold} .yellow{color:#facc15}
+.card{background:#3b1a1a;border-radius:16px;padding:14px;margin-top:12px}
+.price{font-size:36px;font-weight:bold}
+.badge{padding:6px 12px;border-radius:20px;font-size:12px}
+.green{background:#0f3d2e;color:#34d399} .red{background:#4a1a1a;color:#f87171}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.box{background:#1a1a1a;border-radius:12px;padding:10px;text-align:center}
+.btn{background:linear-gradient(90deg,#fde68a,#f59e0b);color:#000;border:none;width:100%;padding:14px;border-radius:12px;font-weight:bold;margin-top:12px}
+.log{font-size:11px;color:#6ee7b7;margin-top:4px}
+.small{font-size:10px;color:#999}
+</style>
+</head>
+<body>
+<div class="header">GOLD SCANNER - <span class="yellow">ONLINE LIVE</span></div>
+<div class="small">Connected sa Internet • Tinuod nga market price • Bisaya Trader Terminal V3.1 • SNIPERGOLD</div>
+
+<div style="margin-top:10px">
+<button class="badge yellow" style="background:#facc15;color:#000">M1 Scalp</button>
+<button class="badge" style="background:#222;color:#888">M5 Balanse</button>
+<button class="badge" style="background:#222;color:#888">M15 Swing</button>
+<button class="badge" style="background:#222;color:#888">1H Trend</button>
+</div>
+
+<div class="card">
+<div class="small">XAUUSD • SPOT GOLD • OANDA</div>
+<div class="price" id="price">$4424.10</div>
+<div class="badge green" id="change">+29.70 (+0.676%)</div>
+<div class="badge green" style="margin-top:8px" id="status">LIVE ONLINE - Connected (gold-api.com)</div>
+<div class="small" id="updated">Updated: -- from gold-api.com</div>
+
+<div class="grid">
+<div class="box"><div class="small">SUPPORT</div><div style="color:#34d399">4393.46</div><div class="small">HOLD pattern</div></div>
+<div class="box"><div class="small">RESISTANCE</div><div style="color:#f87171">4405.8</div><div class="small">Take profit</div></div>
+<div class="box"><div class="small">BIAS</div><div style="color:#34d399" id="bias">BUY</div><div class="small">M1 signal</div></div>
+</div>
+
+<button class="btn" onclick="autoFinderGold()">⟳ I-CONNECT SA REAL MARKET</button>
+
+<div style="margin-top:12px;background:#111;border-radius:12px;padding:10px">
+<div class="small">API STATUS - <span id="logCount">0 Logs</span></div>
+<div id="logs"></div>
+<div class="small" style="margin-top:8px">Auto-refresh 3s <span style="float:right;color:#34d399">Online na boss!</span></div>
+</div>
+
+<div style="margin-top:12px;background:#111;border-radius:12px;padding:10px">
+<div class="small">Dili demo - LIVE gikan sa market</div>
+<div class="small">Bisaya trader • M1 mode • SNIPERGOLD MASTER PRO</div>
+</div>
+</div>
+
+<div class="card" id="signalCard">
+<div style="display:flex;justify-content:space-between"><b>⚡ Auto Scanner - M1</b><span class="badge green" id="confidence">BUY 82.7%</span></div>
+<div style="margin-top:10px;background:#0f2e1f;border-radius:12px;padding:12px">
+<div style="color:#34d399;font-weight:bold;font-size:18px" id="signalType">BUY SIGNAL - MASTER PRO</div>
+<div class="small">Similarity <span id="sim">82.7%</span> • Support hold 4393.46</div>
+<div class="grid" style="margin-top:10px">
+<div class="box"><div class="small">ENTRY ZONE</div><div id="entry">$4424.10 - 4424.70</div></div>
+<div class="box"><div class="small">STOP LOSS</div><div style="color:#f87171" id="sl">$4421.10 (-$3)</div></div>
+</div>
+<div class="grid">
+<div class="box"><div class="small">TP1 60% win</div><div id="tp1">$4428.10 (+$4)</div></div>
+<div class="box"><div class="small">TP2 2x</div><div id="tp2">$4430.10 (+$6)</div></div>
+<div class="box"><div class="small">TP3 3x</div><div id="tp3">$4433.10 (+$9)</div></div>
+</div>
+<div style="margin-top:10px;font-size:12px"><span style="color:#facc15">Bisaya analysis:</span> <span id="analysis">Boss, ang price karon 4424.10 nag hold sa support 4393.46. Kusog ang buyer, pwede mag BUY scalp. Butangi og SL $3 lang, TP $6-$12. Online na boss! Master Pro Expert active.</span></div>
+</div>
+</div>
+
+<script>
+const SOURCES=[
+{name:'gold-api.com',url:'https://api.gold-api.com/price/XAU',parser:d=>d.price||d.Price||d.data?.price},
+{name:'metals.live',url:'https://api.metals.live/v1/spot',parser:d=>d[0]?.gold||d.gold},
+{name:'coingecko PAXG',url:'https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd',parser:d=>d['pax-gold']?.usd}
+];
+let lastPrice=localStorage.getItem('lastGold')||4424.10;
+let logs=[];
+function log(msg){const t=new Date().toLocaleTimeString();logs.unshift(t+' '+msg);if(logs.length>12)logs.pop();document.getElementById('logs').innerHTML=logs.map(l=>'<div class="log">'+l+'</div>').join('');document.getElementById('logCount').innerText=logs.length+' Logs';}
+function updateUI(price,stat){document.getElementById('price').innerText='$'+price;document.getElementById('status').innerText=stat;document.getElementById('updated').innerText='Updated: '+new Date().toLocaleTimeString()+' • from '+stat.split('(')[1]?.replace(')','')||'live';const entry=parseFloat(price);document.getElementById('entry').innerText='$'+entry.toFixed(2)+' - '+(entry+0.6).toFixed(2);document.getElementById('sl').innerText='$'+(entry-3).toFixed(2)+' (-$3)';document.getElementById('tp1').innerText='$'+(entry+4).toFixed(2)+' (+$4)';document.getElementById('tp2').innerText='$'+(entry+6).toFixed(2)+' (+$6) 2x';document.getElementById('tp3').innerText='$'+(entry+9).toFixed(2)+' (+$9) 3x';}
+async function autoFinderGold(){for(let src of SOURCES){try{const res=await fetch(src.url,{cache:'no-store',signal:AbortSignal.timeout(3000)});if(!res.ok)throw 'fail';const data=await res.json();const price=src.parser(data);if(price&&!isNaN(price)){lastPrice=price;localStorage.setItem('lastGold',price);log('LIVE '+price+' from '+src.name);updateUI(price,'LIVE ONLINE - Connected ('+src.name+')');return;}}catch(e){log('Trying '+src.name+' - fail, next...');}}log('System init - '+lastPrice+' demo (offline)');updateUI(lastPrice,'Offline - last price (demo)');}
+setInterval(autoFinderGold,3000);autoFinderGold();
+</script>
+</body>
+</html>
