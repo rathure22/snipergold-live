@@ -1,0 +1,20 @@
+
+Ngano 0s ra ang Build ug No APK?
+
+Kay wala nimo na-copy ang FULL PACKAGE, build.yml ra!
+Kinahanglan i-unzip ang TANAN files: app/build.gradle + MainActivity.kt + AndroidManifest
+
+Unsaon:
+cd ~/snipergold-v9
+unzip -o /storage/emulated/0/Download/SniperGold_FINAL_FIX_APK.zip
+cp -r .github app settings.gradle build.gradle gradle.properties ~/snipergold-v9/  (kung nag unzip ka sa lain folder)
+
+Or mas dali:
+cd ~/snipergold-v9
+unzip -o /storage/emulated/0/Download/SniperGold_FINAL_FIX_APK.zip -d ~/my_tmp
+cp -r ~/my_tmp/* .
+cp -r ~/my_tmp/.github .
+chmod +x gradlew
+git add .
+git commit -m "FULL FIX - APK NOW BUILDS"
+git push

@@ -1,4 +1,4 @@
-name: Build SniperGold - Jetpack Compose Canvas
+name: Build SniperGold - Jetpack Compose Canvas FINAL
 
 on: [push]
 
@@ -17,25 +17,36 @@ jobs:
 
       - name: Setup Android SDK - MANUAL NO TOOLS
         run: |
+          echo "Setting up SDK..."
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" ||           yes | $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
+          ls $ANDROID_HOME/platforms/ || true
 
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build APK - Jetpack Compose Canvas
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Show project files - DEBUG
+        run: |
+          echo "=== APP BUILD.GRADLE ==="
+          cat app/build.gradle | head -50
+          echo ""
+          echo "=== MainActivity exists? ==="
+          ls -lh app/src/main/java/com/snipergold/v9/ || true
+
+      - name: Build APK - Jetpack Compose Canvas - FULL BUILD
+        run: ./gradlew assembleDebug --stacktrace --info
+        # Dili 0s, dapat 2-3 minutes ni!
 
       - name: List APK files - DEBUG
         run: |
-          echo "=== Checking APK ==="
+          echo "=== Searching for APK ==="
+          find . -name "*.apk" -type f || true
           ls -R app/build/outputs/ || true
           ls -lh app/build/outputs/apk/debug/ || true
-          find app/build -name "*.apk" || true
 
-      - name: Upload APK Artifact - GUARANTEED
+      - name: Upload APK Artifact - WILDCARD GUARANTEED
         uses: actions/upload-artifact@v4
         with:
           name: SniperGold-APK-FINAL
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 30
