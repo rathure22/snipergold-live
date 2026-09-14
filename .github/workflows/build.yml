@@ -15,18 +15,27 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Setup Android SDK - MANUAL - COMPOSE
+      - name: Setup Android SDK - MANUAL NO TOOLS
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" 2>&1 ||           yes | $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" 2>&1 || true
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" ||           yes | $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
 
-      - name: Grant execute permission
+      - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build Debug APK - Jetpack Compose Canvas
+      - name: Build APK - Jetpack Compose Canvas
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Upload APK
+      - name: List APK files - DEBUG
+        run: |
+          echo "=== Checking APK ==="
+          ls -R app/build/outputs/ || true
+          ls -lh app/build/outputs/apk/debug/ || true
+          find app/build -name "*.apk" || true
+
+      - name: Upload APK Artifact - GUARANTEED
         uses: actions/upload-artifact@v4
         with:
-          name: SniperGold-Jetpack-Compose-Canvas-APK
-          path: app/build/outputs/apk/debug/*.apk
+          name: SniperGold-APK-FINAL
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
