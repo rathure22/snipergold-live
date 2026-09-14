@@ -1,4 +1,4 @@
-name: Build SniperGold - Jetpack Compose Canvas FINAL
+name: Build SniperGold - WORKING FINAL NO WRAPPER
 
 on: [push]
 
@@ -13,40 +13,38 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: Setup Android SDK - MANUAL NO TOOLS
+      - name: Setup Gradle 8.4 - DIRECT NO WRAPPER NEEDED
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.4
+
+      - name: Setup Android SDK
         run: |
-          echo "Setting up SDK..."
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" ||           yes | $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
-          ls $ANDROID_HOME/platforms/ || true
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
+          echo "SDK OK"
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
-      - name: Show project files - DEBUG
+      - name: Show project files
         run: |
-          echo "=== APP BUILD.GRADLE ==="
-          cat app/build.gradle | head -50
-          echo ""
-          echo "=== MainActivity exists? ==="
-          ls -lh app/src/main/java/com/snipergold/v9/ || true
+          echo "=== FILES ==="
+          ls -lh
+          ls -lh app/
+          cat app/build.gradle | head -60
+          ls -lh app/src/main/java/com/snipergold/v9/
 
-      - name: Build APK - Jetpack Compose Canvas - FULL BUILD
-        run: ./gradlew assembleDebug --stacktrace --info
-        # Dili 0s, dapat 2-3 minutes ni!
+      - name: Build APK - DIRECT GRADLE - 2-3 MINUTES
+        run: gradle assembleDebug --stacktrace
 
-      - name: List APK files - DEBUG
+      - name: List APK
         run: |
-          echo "=== Searching for APK ==="
-          find . -name "*.apk" -type f || true
-          ls -R app/build/outputs/ || true
+          echo "=== FIND APK ==="
+          find . -name "*.apk" -type f
           ls -lh app/build/outputs/apk/debug/ || true
 
-      - name: Upload APK Artifact - WILDCARD GUARANTEED
+      - name: Upload APK - GUARANTEED
         uses: actions/upload-artifact@v4
         with:
-          name: SniperGold-APK-FINAL
+          name: SniperGold-APK-FINAL-WORKING
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 30
