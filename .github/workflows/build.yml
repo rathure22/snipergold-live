@@ -1,4 +1,4 @@
-name: Build SniperGold V11 PRO GOLD TRACKER
+name: Build SniperGold V11 PRO - GREEN FINAL
 
 on: [push]
 
@@ -7,27 +7,67 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: CLEAN OLD
-        run: rm -rf app/src/main/java/com/rathure22 && ls app/src/main/java/com/snipergold/v9/ || true
+
+      - name: ULTRA CLEAN - DELETE OLD PACKAGE
+        run: |
+          echo "=== BEFORE ==="
+          ls -R app/src/main/java/ || true
+          rm -rf app/src/main/java/com/rathure22
+          rm -rf app/src/main/java/com/rathure
+          rm -rf app/src/main/java/com/rathure22/snipergold
+          echo "=== AFTER ==="
+          ls -R app/src/main/java/ || true
+          echo "Should be only com/snipergold/v9"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Setup Gradle 8.4
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: 8.4
-      - name: Setup Android SDK
-        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
-      - name: Build APK V11 PRO
-        run: gradle assembleDebug --stacktrace
+          cache: gradle
+
+      - name: Setup Android SDK - MANUAL GREEN METHOD
+        run: |
+          echo "Setting up SDK..."
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || \
+          yes | $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
+          echo "SDK Ready"
+          ls $ANDROID_HOME/platforms/ || true
+
+      - name: Fix gradle wrapper jar if missing
+        run: |
+          if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "Wrapper jar missing - downloading..."
+            mkdir -p gradle/wrapper
+            curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar || \
+            wget -O gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar || true
+          fi
+          ls -lh gradle/wrapper/ || true
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Show project files
+        run: |
+          echo "=== BUILD.GRADLE ==="
+          cat app/build.gradle | head -20
+          echo ""
+          echo "=== MainActivity ==="
+          ls -lh app/src/main/java/com/snipergold/v9/
+
+      - name: Build APK V11 PRO - GREEN METHOD
+        run: ./gradlew assembleDebug --stacktrace
+
       - name: List APK
-        run: find . -name "*.apk" -ls
-      - name: Upload APK V11 PRO
+        run: |
+          echo "=== FIND APK ==="
+          find . -name "*.apk" -type f || true
+          ls -lh app/build/outputs/apk/debug/ || true
+
+      - name: Upload APK V11 GREEN
         uses: actions/upload-artifact@v4
         with:
-          name: SniperGold-V11-PRO-GOLD-TRACKER
+          name: SniperGold-V11-PRO-GREEN-FINAL
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 30
