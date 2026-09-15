@@ -1,4 +1,4 @@
-name: Build SniperGold V13 - FIX GRADLE 9.7.1 ERROR - PINNED 8.4 GREEN #17
+name: Build SniperGold V14 - FIX MANIFEST - GREEN #17 EXACT
 
 on: [push]
 
@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: CLEAN OLD - SAME AS GREEN #17
+      - name: CLEAN OLD - SAME AS GREEN #17 - 0s
         run: |
           rm -rf app/src/main/java/com/rathure22
           rm -rf app/src/main/java/com/rathure
@@ -19,42 +19,33 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: Setup Gradle 8.4 - PINNED - NOT 9.7.1 - SAME AS GREEN #17
+      - name: Setup Gradle 8.4 - PINNED - SAME AS GREEN #17
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.4
-          cache-disabled: false
 
-      - name: Setup Android SDK
+      - name: Setup Android SDK - SAME AS GREEN #17 - 10s
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
 
-      - name: Fix wrapper jar 8.4 - FORCE 8.4 NOT 9.7.1
+      - name: Show files - SAME AS GREEN #17
         run: |
-          mkdir -p gradle/wrapper
-          rm -f gradle/wrapper/gradle-wrapper.jar
-          curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar
-          ls -lh gradle/wrapper/
-          cat gradle/wrapper/gradle-wrapper.properties
           cat gradle.properties
-          echo "Gradle version should be 8.4, NOT 9.7.1"
+          ls -R app/src/main/java/ || true
+          ls -lh gradle/wrapper/ || true
 
-      - name: Make executable
-        run: chmod +x gradlew && ./gradlew --version
+      - name: Build APK - Jetpack Compose Canvas - SAME AS GREEN #17
+        run: gradle assembleDebug --stacktrace
 
-      - name: Build APK - PINNED GRADLE 8.4 - GREEN #17 METHOD
-        run: ./gradlew assembleDebug --stacktrace --no-configuration-cache
-
-      - name: List APK
+      - name: List APK - SAME AS GREEN #17
         run: |
           find . -name "*.apk" -type f -ls
           ls -lh app/build/outputs/apk/debug/ || true
 
-      - name: Upload APK - V13 FIX GRADLE
+      - name: Upload APK - SAME AS GREEN #17
         uses: actions/upload-artifact@v4
         with:
-          name: SniperGold-V13-FIX-GRADLE-8.4-GREEN
+          name: SniperGold-V14-FIX-MANIFEST-GREEN-17-METHOD
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error

@@ -27,20 +27,18 @@ data class CandleData(val open: Float, val high: Float, val low: Float, val clos
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { SniperGoldV13Fix() }
+        setContent { SniperGoldV14() }
     }
 }
 
 @Composable
-fun SniperGoldV13Fix() {
+fun SniperGoldV14() {
     var price by remember { mutableStateOf(4294.70f) }
-    var change by remember { mutableStateOf(12.36f) }
     var guideHigh by remember { mutableStateOf(4302f) }
     var guideLow by remember { mutableStateOf(4287f) }
     var pattern by remember { mutableStateOf("M") }
     var signal by remember { mutableStateOf("WAIT") }
     var marketTrend by remember { mutableStateOf("UPTREND") }
-    var direction by remember { mutableStateOf("BULLISH") }
     var nextSec by remember { mutableStateOf(46) }
 
     var candles by remember { mutableStateOf(List(25) { i ->
@@ -57,21 +55,17 @@ fun SniperGoldV13Fix() {
             delay(1000)
             val newPrice = (price + (Random.nextFloat()-0.5f)*1.2f).coerceIn(4286f,4303f)
             price = newPrice
-            change = newPrice - 4282.34f
             nextSec = if (nextSec<=1) 60 else nextSec-1
             val last = candles.last()
             candles = candles.dropLast(1) + last.copy(close=newPrice, high=maxOf(last.high,newPrice), low=minOf(last.low,newPrice))
             guideHigh = candles.maxOf { it.high } -0.5f
             guideLow = candles.minOf { it.low } +0.5f
-            val up = candles.takeLast(5).map{it.close}.zipWithNext().all{it.second>it.first}
-            val down = candles.takeLast(5).map{it.close}.zipWithNext().all{it.second<it.first}
-            if (up) { marketTrend="UPTREND"; direction="BULLISH"; pattern="M" }
-            else if (down) { marketTrend="DOWNTREND"; direction="BEARISH"; pattern="W" }
             signal = when {
                 newPrice >= guideHigh-0.8f -> "SELL"
                 newPrice <= guideLow+0.8f -> "BUY"
                 else -> "WAIT"
             }
+            marketTrend = if (candles.takeLast(5).map{it.close}.zipWithNext().all{it.second>it.first}) "UPTREND" else "DOWNTREND"
         }
     }
 
@@ -85,15 +79,12 @@ fun SniperGoldV13Fix() {
                         Text("LIVE", color=Color(0xFF00FF88), fontSize=8.sp, fontWeight=FontWeight.Bold)
                     }
                 }
-                Text("Gradle 8.4 FIXED - Same as GREEN #17", color=Color.Gray, fontSize=9.sp)
+                Text("V14 FIX MANIFEST - GREEN #17 METHOD", color=Color.Gray, fontSize=9.sp)
             }
-            Column(horizontalAlignment=Alignment.End) {
-                Text("$"+String.format("%.2f", price), color=Color(0xFF00FF88), fontSize=20.sp, fontWeight=FontWeight.Black)
-                Text("+"+String.format("%.2f", change), color=Color(0xFF00FF88), fontSize=10.sp, fontWeight=FontWeight.Bold)
-            }
+            Text("$"+String.format("%.2f", price), color=Color(0xFF00FF88), fontSize=20.sp, fontWeight=FontWeight.Black)
         }
         Spacer(modifier=Modifier.height(8.dp))
-        Box(modifier=Modifier.fillMaxWidth().height(280.dp).background(Color(0xFF0F141E), RoundedCornerShape(12.dp)).border(1.dp, Color(0xFF1E2A3A), RoundedCornerShape(12.dp)).padding(8.dp)) {
+        Box(modifier=Modifier.fillMaxWidth().height(300.dp).background(Color(0xFF0F141E), RoundedCornerShape(12.dp)).border(1.dp, Color(0xFF1E2A3A), RoundedCornerShape(12.dp)).padding(8.dp)) {
             Canvas(modifier=Modifier.fillMaxSize()) {
                 val w=size.width; val h=size.height
                 val allHigh=candles.maxOf{it.high}; val allLow=candles.minOf{it.low}
@@ -118,10 +109,9 @@ fun SniperGoldV13Fix() {
                 Text("BOS low "+String.format("%.2f", guideLow), color=Color.Red, fontSize=8.sp)
             }
         }
-        Spacer(modifier=Modifier.height(6.dp))
+        Spacer(modifier=Modifier.height(8.dp))
         Row(modifier=Modifier.fillMaxWidth().background(Color(0xFF121821), RoundedCornerShape(8.dp)).padding(10.dp), horizontalArrangement=Arrangement.SpaceBetween) {
             Text(marketTrend, color=Color(0xFF00FF88), fontSize=10.sp, fontWeight=FontWeight.Bold)
-            Text(direction, color=Color(0xFF00FF88), fontSize=10.sp, fontWeight=FontWeight.Bold)
             Text("Next: 00:"+String.format("%02d", nextSec), color=Color.White, fontSize=9.sp)
         }
         Spacer(modifier=Modifier.height(10.dp))
@@ -136,12 +126,12 @@ fun SniperGoldV13Fix() {
                 Box(modifier=Modifier.fillMaxWidth().background(Color(0xFF0F0F0F), RoundedCornerShape(8.dp)).padding(12.dp), contentAlignment=Alignment.Center) {
                     Column(horizontalAlignment=Alignment.CenterHorizontally) {
                         Text(signal, color=when(signal){"BUY"->Color(0xFF00FF88);"SELL"->Color.Red;else->Color.Gray}, fontSize=26.sp, fontWeight=FontWeight.Black)
-                        Text("Gradle 8.4 FIXED - Based on GREEN #17", color=Color.Gray, fontSize=9.sp)
+                        Text("Based on GREEN #17 2m 14s method", color=Color.Gray, fontSize=9.sp)
                     }
                 }
             }
         }
         Spacer(modifier=Modifier.height(20.dp))
-        Text("V13 FIX GRADLE 9.7.1 ERROR - PINNED TO 8.4 - GREEN #17 METHOD", color=Color(0xFF00FF88), fontSize=8.sp, modifier=Modifier.align(Alignment.CenterHorizontally))
+        Text("V14 FIX MANIFEST - EXACT GREEN #17 BUILD METHOD", color=Color(0xFF00FF88), fontSize=8.sp, modifier=Modifier.align(Alignment.CenterHorizontally))
     }
 }
