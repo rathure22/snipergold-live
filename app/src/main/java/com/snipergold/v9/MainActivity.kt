@@ -330,7 +330,7 @@ fun SniperGoldV11Pro() {
                             Box(modifier = Modifier.background(Color(0xFF0A2E1F), RoundedCornerShape(12.dp)).border(1.dp, Color(0xFF00FF88), RoundedCornerShape(12.dp)).padding(6.dp)) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text("LONDON", color = Color(0xFF00FF88), fontSize = 8.sp, fontWeight = FontWeight.Bold)
-                                    Text("08:00-16:30\n(UTC+0)", color = Color.Gray, fontSize = 6.sp)
+                                    Text("08:00-16:30 (UTC)", color = Color.Gray, fontSize = 6.sp)
                                 }
                             }
                             Box(modifier = Modifier.background(Color(0xFF1A1A1A), RoundedCornerShape(12.dp)).padding(6.dp)) {
