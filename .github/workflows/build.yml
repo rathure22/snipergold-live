@@ -1,4 +1,4 @@
-name: Build SniperGold V11 PRO - GREEN 21S COMEBACK
+name: Build SniperGold V13 - FIX GRADLE 9.7.1 ERROR - PINNED 8.4 GREEN #17
 
 on: [push]
 
@@ -8,71 +8,53 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: ULTRA CLEAN OLD PACKAGE
+      - name: CLEAN OLD - SAME AS GREEN #17
         run: |
-          echo "=== BEFORE ==="
-          ls -R app/src/main/java/ || true
           rm -rf app/src/main/java/com/rathure22
           rm -rf app/src/main/java/com/rathure
-          rm -rf app/src/main/java/com/rathure22/snipergold
-          echo "=== AFTER ==="
-          echo "Cleaned - only com/snipergold/v9 should remain"
           ls -R app/src/main/java/ || true
-          echo "Should be only com/snipergold/v9"
 
-      - name: Set up JDK 17
+      - name: Set up JDK 17 - SAME AS GREEN #17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
 
-      - name: Setup Android SDK - MANUAL GREEN METHOD
-        run: |
-          echo "Setting up SDK..."
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || \
-          yes | $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
-          echo "SDK Ready"
-          ls $ANDROID_HOME/platforms/ || true
+      - name: Setup Gradle 8.4 - PINNED - NOT 9.7.1 - SAME AS GREEN #17
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.4
+          cache-disabled: false
 
-      - name: Fix gradle wrapper jar if missing
+      - name: Setup Android SDK
         run: |
-          if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
-            echo "Wrapper jar missing - downloading..."
-            mkdir -p gradle/wrapper
-            curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar || \
-            wget -O gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar || true
-          fi
-          ls -lh gradle/wrapper/ || true
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
-      - name: Show project files
+      - name: Fix wrapper jar 8.4 - FORCE 8.4 NOT 9.7.1
         run: |
-          echo "=== BUILD.GRADLE ==="
-          cat app/build.gradle | head -20
-          echo ""
-          echo "=== gradle.properties ==="
+          mkdir -p gradle/wrapper
+          rm -f gradle/wrapper/gradle-wrapper.jar
+          curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar
+          ls -lh gradle/wrapper/
+          cat gradle/wrapper/gradle-wrapper.properties
           cat gradle.properties
-          echo "LINES: $(wc -l < gradle.properties)"
-          echo ""
-          echo "=== MainActivity ==="
-          ls -lh app/src/main/java/com/snipergold/v9/
+          echo "Gradle version should be 8.4, NOT 9.7.1"
 
-      - name: Build APK V11 PRO - GREEN METHOD
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Make executable
+        run: chmod +x gradlew && ./gradlew --version
+
+      - name: Build APK - PINNED GRADLE 8.4 - GREEN #17 METHOD
+        run: ./gradlew assembleDebug --stacktrace --no-configuration-cache
 
       - name: List APK
         run: |
-          echo "=== FIND APK ==="
-          find . -name "*.apk" -type f || true
+          find . -name "*.apk" -type f -ls
           ls -lh app/build/outputs/apk/debug/ || true
 
-      - name: Upload APK V11 GREEN
+      - name: Upload APK - V13 FIX GRADLE
         uses: actions/upload-artifact@v4
         with:
-          name: SniperGold-V11-PRO-GREEN-FINAL
+          name: SniperGold-V13-FIX-GRADLE-8.4-GREEN
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-          retention-days: 30
