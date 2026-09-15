@@ -1,4 +1,4 @@
-name: Build SniperGold - V19 FINAL GREEN - SAME AS #17
+name: Build SniperGold - V21 FULL JETPACK COMPOSE PRO - GREEN #17
 
 on: [push]
 
@@ -8,65 +8,48 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: NUCLEAR CLEAN - DELETE rathure22 - SAME AS GREEN #17
+      - name: NUCLEAR CLEAN - SAME AS GREEN #17
         run: |
-          echo "=== BEFORE CLEAN ==="
-          ls -R app/src/main/java/com/ 2>/dev/null || true
-          find app/src/main/java -type f -name "*.kt" | sort
-          echo ""
-          echo "=== CLEANING ==="
-          rm -rf app/build build .gradle
           rm -rf app/src/main/java/com/rathure22
           rm -rf app/src/main/java/com/rathure
-          rm -rf app/src/main/java/com/rathure22_bak
-          git rm -rf app/src/main/java/com/rathure22 2>/dev/null || true
-          git rm -rf app/src/main/java/com/rathure 2>/dev/null || true
-          echo ""
-          echo "=== AFTER CLEAN - ONLY snipergold/v9 ==="
+          rm -rf app/build build .gradle
+          echo "Cleaned - only snipergold/v9 remains"
           find app/src/main/java -type f | sort
-          ls -R app/src/main/java/com/ || true
 
-      - name: Set up JDK 17 - SAME AS GREEN #17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle 8.4 - SAME AS GREEN #17
+      - name: Setup Gradle 8.4
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.4
 
-      - name: Setup Android SDK - SAME AS GREEN #17
+      - name: Setup Android SDK
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
 
-      - name: Verify Structure - BEFORE BUILD
+      - name: Verify Full Compose
         run: |
-          echo "=== VERIFY ==="
-          if [ ! -f "app/src/main/java/com/snipergold/v9/MainActivity.kt" ]; then
-            echo "ERROR: MainActivity.kt not found!"
-            find app/src/main/java -type f | sort
-            exit 1
-          fi
-          echo "✓ MainActivity.kt exists"
+          echo "MainActivity lines:"
           wc -l app/src/main/java/com/snipergold/v9/MainActivity.kt
-          cat gradle.properties
-          echo ""
-          echo "=== FILES THAT WILL BE BUILT ==="
-          find app/src/main/java -type f -name "*.kt" | sort
+          echo "Checking Canvas, Candle, Gold Tracker..."
+          grep -q "Canvas" app/src/main/java/com/snipergold/v9/MainActivity.kt && echo "✓ Canvas found"
+          grep -q "GOLD TRACKER" app/src/main/java/com/snipergold/v9/MainActivity.kt && echo "✓ Gold Tracker found"
+          grep -q "RESISTANCE ZONE" app/src/main/java/com/snipergold/v9/MainActivity.kt && echo "✓ Resistance Zone found"
 
-      - name: Build APK - SAME AS GREEN #17 - 1m 52s
+      - name: Build APK - FULL COMPOSE - GREEN #17 METHOD
         run: gradle assembleDebug --stacktrace
 
-      - name: List APK - SAME AS GREEN #17
+      - name: List APK
         run: |
-          find . -name "*.apk" -type f -ls
           ls -lh app/build/outputs/apk/debug/ || true
 
-      - name: Upload APK - FINAL GREEN
+      - name: Upload APK - FULL JETPACK COMPOSE PRO
         uses: actions/upload-artifact@v4
         with:
-          name: SniperGold-V19-FINAL-GREEN-SAME-AS-17
+          name: SniperGold-V21-FULL-JETPACK-COMPOSE-PRO
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
