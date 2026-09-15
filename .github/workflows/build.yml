@@ -1,4 +1,4 @@
-name: Build SniperGold - FINAL CLEAN OLD PACKAGE - SAME AS GREEN #17
+name: Build SniperGold - CLEAN REPOSITORY - GREEN #17
 
 on: [push]
 
@@ -8,50 +8,55 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: CLEAN OLD - SAME AS GREEN
+      - name: CLEAN REPOSITORY - DELETE OLD rathure22
         run: |
+          echo "=== BEFORE CLEAN ==="
+          ls -R app/src/main/java/ || true
+          echo ""
+          echo "=== CLEANING ==="
           rm -rf app/src/main/java/com/rathure22
           rm -rf app/src/main/java/com/rathure
-          echo "Cleaned - only com/snipergold/v9 should remain"
+          rm -rf app/src/main/java/com/rathure22_bak
+          rm -rf app/src/main/java/com/old
+          git rm -rf app/src/main/java/com/rathure22 2>/dev/null || true
+          git rm -rf app/src/main/java/com/rathure 2>/dev/null || true
+          echo ""
+          echo "=== AFTER CLEAN - SHOULD BE ONLY snipergold ==="
           ls -R app/src/main/java/ || true
+          echo "Repository cleaned!"
 
-      - name: Set up JDK 17 - SAME AS GREEN
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle 8.4 - PINNED - SAME AS GREEN #17
+      - name: Setup Gradle 8.4
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.4
 
-      - name: Setup Android SDK - SAME AS GREEN #17
+      - name: Setup Android SDK
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
-          echo "SDK setup done"
 
-      - name: Show files - SAME AS GREEN #17
+      - name: Show files
         run: |
-          echo "=== gradle.properties ==="
           cat gradle.properties
           echo ""
-          echo "=== project files ==="
-          ls -R app/src/main/java/ || true
+          ls -lh app/src/main/java/com/snipergold/v9/ || true
 
-      - name: Build APK - Jetpack Compose Canvas - SAME AS GREEN #17 - 1m 52s
+      - name: Build APK - CLEAN REPOSITORY
         run: gradle assembleDebug --stacktrace
 
-      - name: List APK - SAME AS GREEN #17
+      - name: List APK
         run: |
-          echo "=== APK FILES ==="
           find . -name "*.apk" -type f -ls
           ls -lh app/build/outputs/apk/debug/ || true
 
-      - name: Upload APK - SAME AS GREEN #17
+      - name: Upload APK - CLEAN REPOSITORY GREEN
         uses: actions/upload-artifact@v4
         with:
-          name: SniperGold-V15-ULTIMATE-GREEN-SAME-AS-17
+          name: SniperGold-CLEAN-REPOSITORY-GREEN
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-          retention-days: 30
