@@ -1,4 +1,4 @@
-name: Build SniperGold - ULTRA CLEAN FIX 7s ERROR - SAME AS GREEN #17
+name: Build SniperGold - V18 NUCLEAR CLEAN - FIX 7s ERROR - GREEN #17
 
 on: [push]
 
@@ -8,63 +8,80 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: ULTRA CLEAN REPOSITORY - DELETE ALL OLD
+      - name: NUCLEAR CLEAN - DELETE ALL OLD
         run: |
-          echo "=== BEFORE ==="
-          find app/src/main/java -type f -name "*.kt" | head -20
+          echo "=== BEFORE CLEAN ==="
           ls -R app/src/main/java/com/ || true
           echo ""
-          echo "=== DELETING OLD rathure22 ==="
-          rm -rf app/src/main/java/com/rathure22
-          rm -rf app/src/main/java/com/rathure
-          rm -rf app/src/main/java/com/rathure22_bak
+          echo "=== NUCLEAR CLEAN ==="
           rm -rf app/build
           rm -rf build
           rm -rf .gradle
+          rm -rf ~/.gradle/caches
+          rm -rf app/src/main/java/com/rathure22
+          rm -rf app/src/main/java/com/rathure
+          find app/src/main/java/com -type d ! -name "snipergold" ! -name "com" ! -path "*/snipergold/*" -exec rm -rf {} + 2>/dev/null || true
           git rm -rf app/src/main/java/com/rathure22 2>/dev/null || true
           git rm -rf app/src/main/java/com/rathure 2>/dev/null || true
-          echo ""
-          echo "=== AFTER CLEAN - ONLY snipergold/v9 SHOULD REMAIN ==="
+          echo "=== AFTER NUCLEAR CLEAN ==="
           find app/src/main/java -type f | sort
           ls -R app/src/main/java/com/ || true
 
-      - name: Set up JDK 17 - SAME AS GREEN #17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle 8.4 - SAME AS GREEN #17
+      - name: Setup Gradle 8.4
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.4
 
-      - name: Setup Android SDK - SAME AS GREEN #17
+      - name: Setup Android SDK
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
 
-      - name: Show files - SAME AS GREEN #17
+      - name: Clean Everything Before Build
         run: |
-          echo "gradle.properties:"
-          cat gradle.properties
-          echo ""
-          echo "MainActivity exists:"
-          ls -lh app/src/main/java/com/snipergold/v9/MainActivity.kt
-          wc -l app/src/main/java/com/snipergold/v9/MainActivity.kt
+          echo "=== NUCLEAR CLEAN 2 ==="
+          rm -rf app/build build .gradle
+          rm -rf ~/.gradle/caches
+          find app/src/main/java/com -type d ! -name "snipergold" -exec rm -rf {} + 2>/dev/null || true
+          gradle clean --no-daemon || true
+          echo "Clean done"
 
-      - name: Build APK - ULTRA CLEAN - SAME AS GREEN #17
+      - name: Verify Structure
         run: |
-          gradle clean
-          gradle assembleDebug --stacktrace
+          echo "Remaining source files:"
+          find app/src/main/java -type f -name "*.kt" | sort
+          echo ""
+          echo "Directories:"
+          ls -R app/src/main/java/com/ || true
+
+      - name: Validate Before Build
+        run: |
+          if [ ! -f "app/src/main/java/com/snipergold/v9/MainActivity.kt" ]; then
+            echo "ERROR: MainActivity.kt not found!"
+            ls -R app/src/main/java/ || true
+            exit 1
+          fi
+          echo "✓ Build structure is valid - MainActivity.kt exists"
+          wc -l app/src/main/java/com/snipergold/v9/MainActivity.kt
+          cat gradle.properties
+
+      - name: Build APK - NUCLEAR CLEAN - GREEN #17 METHOD
+        run: |
+          gradle assembleDebug --stacktrace --no-daemon
 
       - name: List APK
         run: |
           find . -name "*.apk" -type f -ls
           ls -lh app/build/outputs/apk/debug/ || true
 
-      - name: Upload APK - ULTRA CLEAN GREEN
+      - name: Upload APK - NUCLEAR CLEAN GREEN
         uses: actions/upload-artifact@v4
         with:
-          name: SniperGold-V16-ULTRA-CLEAN-FIX-7S-GREEN
+          name: SniperGold-V18-NUCLEAR-CLEAN-GREEN
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
