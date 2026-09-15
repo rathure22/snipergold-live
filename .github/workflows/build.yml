@@ -40,8 +40,8 @@ jobs:
           if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
             echo "Wrapper jar missing - downloading..."
             mkdir -p gradle/wrapper
-            curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar || \
-            wget -O gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar || true
+            curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.4.0/subprojects/wrapper/src/main/resources/gradle/wrapper/gradle-wrapper.jar || \
+            wget -O gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.4.0/subprojects/wrapper/src/main/resources/gradle/wrapper/gradle-wrapper.jar || true
           fi
           ls -lh gradle/wrapper/ || true
 
