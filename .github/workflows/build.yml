@@ -1,4 +1,4 @@
-name: Build SniperGold V14 - FIX MANIFEST - GREEN #17 EXACT
+name: Build SniperGold - FINAL CLEAN OLD PACKAGE - SAME AS GREEN #17
 
 on: [push]
 
@@ -8,13 +8,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: CLEAN OLD - SAME AS GREEN #17 - 0s
+      - name: CLEAN OLD - SAME AS GREEN
         run: |
           rm -rf app/src/main/java/com/rathure22
           rm -rf app/src/main/java/com/rathure
+          echo "Cleaned - only com/snipergold/v9 should remain"
           ls -R app/src/main/java/ || true
 
-      - name: Set up JDK 17 - SAME AS GREEN #17
+      - name: Set up JDK 17 - SAME AS GREEN
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -25,27 +26,32 @@ jobs:
         with:
           gradle-version: 8.4
 
-      - name: Setup Android SDK - SAME AS GREEN #17 - 10s
+      - name: Setup Android SDK - SAME AS GREEN #17
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
+          echo "SDK setup done"
 
       - name: Show files - SAME AS GREEN #17
         run: |
+          echo "=== gradle.properties ==="
           cat gradle.properties
+          echo ""
+          echo "=== project files ==="
           ls -R app/src/main/java/ || true
-          ls -lh gradle/wrapper/ || true
 
-      - name: Build APK - Jetpack Compose Canvas - SAME AS GREEN #17
+      - name: Build APK - Jetpack Compose Canvas - SAME AS GREEN #17 - 1m 52s
         run: gradle assembleDebug --stacktrace
 
       - name: List APK - SAME AS GREEN #17
         run: |
+          echo "=== APK FILES ==="
           find . -name "*.apk" -type f -ls
           ls -lh app/build/outputs/apk/debug/ || true
 
       - name: Upload APK - SAME AS GREEN #17
         uses: actions/upload-artifact@v4
         with:
-          name: SniperGold-V14-FIX-MANIFEST-GREEN-17-METHOD
+          name: SniperGold-V15-ULTIMATE-GREEN-SAME-AS-17
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+          retention-days: 30
